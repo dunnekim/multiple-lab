@@ -442,3 +442,28 @@ body {
     padding: 14px;
   }
 }
+
+/* 모바일에서 Hero 카드 축소/숨기기 */
+@media (max-width: 640px) {
+  .ml-hero {
+    padding: 24px 0 16px;  /* 위아래 여백 줄이기 */
+  }
+
+  .ml-hero-inner {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ml-hero-text h1 {
+    font-size: 20px;
+  }
+
+  .ml-hero-text p {
+    font-size: 13px;
+  }
+
+  /* 예시 카드 너무 크면 아예 숨김 */
+  .ml-hero-preview {
+    display: none;
+  }
+}

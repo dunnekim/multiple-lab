@@ -76,16 +76,44 @@
               </div>
 
               <div class="ml-form-field">
-                <label for="industry">산업 (업종)</label>
-                <select id="industry">
-                  <option value="it_internet">IT / 인터넷</option>
-                  <option value="consumer">소비재</option>
-                  <option value="manufacturing">제조</option>
-                  <option value="game_ent">게임 / 엔터</option>
-                  <option value="bank">은행</option>
-                  <option value="leasing">리스 / 여전사</option>
-                  <option value="other">기타</option>
-                </select>
+<div class="ml-form-field">
+  <label for="industry">산업 (업종)</label>
+  <select id="industry">
+    <optgroup label="비금융">
+      <option value="IT·인터넷·플랫폼">IT·인터넷·플랫폼</option>
+      <option value="게임·엔터">게임·엔터</option>
+      <option value="헬스케어·바이오">헬스케어·바이오</option>
+      <option value="반도체·딥테크">반도체·딥테크</option>
+      <option value="로봇·자동화">로봇·자동화</option>
+      <option value="제조업·부품">제조업·부품</option>
+      <option value="원자재">원자재</option>
+      <option value="에너지·유틸리티">에너지·유틸리티</option>
+      <option value="소비재·화장품">소비재·화장품</option>
+      <option value="필수소비재">필수소비재</option>
+      <option value="리테일·유통">리테일·유통</option>
+      <option value="운송·물류">운송·물류</option>
+      <option value="조선·중공업">조선·중공업</option>
+      <option value="건설·자재">건설·자재</option>
+      <option value="서비스">서비스</option>
+    </optgroup>
+    <optgroup label="금융">
+      <option value="금융지주">금융지주</option>
+      <option value="상업은행">상업은행</option>
+      <option value="저축은행·조합">저축은행·조합</option>
+      <option value="생명보험">생명보험</option>
+      <option value="손해보험">손해보험</option>
+      <option value="증권·선물">증권·선물</option>
+      <option value="자산운용">자산운용</option>
+      <option value="투자자문·일임">투자자문·일임</option>
+      <option value="신기술금융·VC">신기술금융·VC</option>
+      <option value="카드사">카드사</option>
+      <option value="리스·할부금융">리스·할부금융</option>
+    </optgroup>
+    <optgroup label="기타">
+      <option value="other">기타</option>
+    </optgroup>
+  </select>
+</div>
               </div>
 
               <div class="ml-form-field">
@@ -162,18 +190,107 @@
           </div>
 
           <!-- Step 3: 옵션 -->
-          <div class="ml-form-section">
-            <h3>Step 3. 옵션 / 플래그</h3>
-            <div class="ml-grid-3">
-              <div class="ml-form-field">
-                <label>비상장사 여부</label>
-                <div class="ml-checkbox-group">
-                  <label>
-                    <input type="checkbox" id="isPrivate" />
-                    비상장사입니다 (비상장 할인 적용)
-                  </label>
-                </div>
-              </div>
+<div class="ml-form-section">
+  <h3>Step 3. 옵션 / 플래그</h3>
+  <div class="ml-grid-3">
+    <!-- 공통 -->
+    <div class="ml-form-field">
+      <label>비상장사 여부</label>
+      <div class="ml-checkbox-group">
+        <label>
+          <input type="checkbox" id="isPrivate" />
+          비상장사입니다 (비상장 할인 적용)
+        </label>
+      </div>
+    </div>
+
+    <div class="ml-form-field">
+      <label for="sizeBucket">규모 (Size)</label>
+      <select id="sizeBucket">
+        <option value="small">소형</option>
+        <option value="mid" selected>중형</option>
+        <option value="large">대형</option>
+      </select>
+    </div>
+
+    <div class="ml-form-field">
+      <label for="growthScore">
+        성장 / 리레이팅 스코어
+        <span class="ml-label-sub">(-2 ~ +2)</span>
+      </label>
+      <input
+        type="range"
+        id="growthScore"
+        min="-2"
+        max="2"
+        step="1"
+        value="0"
+      />
+      <div class="ml-range-labels">
+        <span>-2 저성장</span>
+        <span>0 보통</span>
+        <span>+2 고성장</span>
+      </div>
+    </div>
+
+    <!-- 비금융 전용 플래그 -->
+    <div class="ml-form-field ml-only-nonfs">
+      <label>비금융 플래그</label>
+      <div class="ml-checkbox-group">
+        <label><input type="checkbox" id="chkGrowth" /> 고성장 (3년 CAGR ≥ 15%)</label><br />
+        <label><input type="checkbox" id="chkTurnaround" /> 턴어라운드 / 구조조정</label><br />
+        <label><input type="checkbox" id="chkGovRisk" /> 회계·내부통제 취약</label>
+      </div>
+    </div>
+
+    <div class="ml-form-field ml-only-nonfs">
+      <label>업종 사이클</label>
+      <div class="ml-radio-group">
+        <label><input type="radio" name="cycleNonfs" value="low" /> 침체</label>
+        <label><input type="radio" name="cycleNonfs" value="normal" checked /> 정상</label>
+        <label><input type="radio" name="cycleNonfs" value="high" /> 호황</label>
+      </div>
+      <p class="ml-help-text">사이클에 따라 멀티플을 약 ±5% 범위에서 조정합니다.</p>
+    </div>
+
+    <div class="ml-form-field ml-only-nonfs">
+      <label>기업 단계 (비금융)</label>
+      <div class="ml-radio-group">
+        <label><input type="radio" name="stageNonfs" value="Early" /> 초기</label>
+        <label><input type="radio" name="stageNonfs" value="Growth" /> 성장</label>
+        <label><input type="radio" name="stageNonfs" value="Mature" checked /> 성숙</label>
+      </div>
+    </div>
+
+    <!-- 금융 전용 플래그 -->
+    <div class="ml-form-field ml-only-fs">
+      <label>
+        <input type="checkbox" id="highRiskFlag" />
+        포트폴리오 리스크가 높은 편입니다
+      </label>
+      <p class="ml-help-text">
+        체크 시 PBR 밴드를 보수적으로 조정합니다.
+      </p>
+    </div>
+
+    <div class="ml-form-field ml-only-fs">
+      <label>금융사 플래그</label>
+      <div class="ml-checkbox-group">
+        <label><input type="checkbox" id="fsChkGovRisk" /> 회계·내부통제 취약</label>
+      </div>
+    </div>
+
+    <div class="ml-form-field ml-only-fs">
+      <label>업종 사이클 (금융)</label>
+      <div class="ml-radio-group">
+        <label><input type="radio" name="cycleFs" value="low" /> 침체</label>
+        <label><input type="radio" name="cycleFs" value="normal" checked /> 정상</label>
+        <label><input type="radio" name="cycleFs" value="high" /> 호황</label>
+      </div>
+      <p class="ml-help-text">사이클에 따라 PBR/PER 밴드를 소폭 조정합니다.</p>
+    </div>
+  </div>
+</div>
 
               <div class="ml-form-field">
                 <label for="sizeBucket">규모 (Size)</label>

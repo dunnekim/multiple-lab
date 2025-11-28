@@ -1,6 +1,7 @@
 // assets/app.js
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ---- DOM 요소 캐시 ----
   const modeInputs = document.querySelectorAll('input[name="mode"]');
   const nonfsFields = document.getElementById("nonfsFields");
   const fsFields = document.getElementById("fsFields");
@@ -9,18 +10,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorBox = document.getElementById("errorBox");
   const resultsSection = document.getElementById("resultsSection");
 
-  // 결과 카드 요소들
+  // 결과 카드
   const lowEquityEl = document.getElementById("lowEquityValue");
   const baseEquityEl = document.getElementById("baseEquityValue");
   const highEquityEl = document.getElementById("highEquityValue");
   const lowDescEl = document.getElementById("lowDesc");
   const baseDescEl = document.getElementById("baseDesc");
   const highDescEl = document.getElementById("highDesc");
+
   const resultTableBody = document.getElementById("resultTableBody");
 
   let chartInstance = null;
 
-  // ---- 1. 모드 변경에 따른 입력 필드 전환 ----
+  // ---- 모드 전환 (비금융 / 금융) ----
   modeInputs.forEach((input) => {
     input.addEventListener("change", () => {
       const mode = getMode();
@@ -31,68 +33,113 @@ document.addEventListener("DOMContentLoaded", () => {
         nonfsFields.classList.add("ml-hidden");
         fsFields.classList.remove("ml-hidden");
       }
-      // 금융 모드일 때만 리스크 플래그 의미 있음
-      toggleFsOptions(mode);
+      toggleModeSpecificOptions(mode);
     });
   });
+
+  // 초기 상태에서도 한 번 호출
+  toggleModeSpecificOptions(getMode());
 
   function getMode() {
     const checked = document.querySelector('input[name="mode"]:checked');
     return checked ? checked.value : "nonfs";
   }
 
-  function toggleFsOptions(mode) {
+  function toggleModeSpecificOptions(mode) {
     const fsOptionBlocks = document.querySelectorAll(".ml-only-fs");
     fsOptionBlocks.forEach((el) => {
-      if (mode === "fs") {
-        el.classList.remove("ml-hidden");
-      } else {
-        el.classList.add("ml-hidden");
-      }
+      if (mode === "fs") el.classList.remove("ml-hidden");
+      else el.classList.add("ml-hidden");
+    });
+
+    const nonfsBlocks = document.querySelectorAll(".ml-only-nonfs");
+    nonfsBlocks.forEach((el) => {
+      if (mode === "nonfs") el.classList.remove("ml-hidden");
+      else el.classList.add("ml-hidden");
     });
   }
 
-  // ---- 2. 룰북/멀티플 설정 ----
-  // 실제 업무에 맞게 숫자 조정하면 됨
+  // ---- 1. 기본 멀티플 룰 ----
+  // 필요하면 이 숫자만 바꿔서 전체 밴드 튜닝하면 됨
   const multipleRules = {
     nonfs: {
+      // EV/EBITDA 기준 업종 평균 (Base)
       baseEbitda: 7.0,
-      lowDiff: -1.5,
-      highDiff: +1.5,
+      lowDiff: -1.5, // Low = 5.5배
+      highDiff: +1.5, // High = 8.5배
     },
     fs: {
+      // PBR 기준 업권 평균 (Base)
       basePbr: 0.9,
-      lowDiff: -0.3,
-      highDiff: +0.2,
+      lowDiff: -0.3, // Low = 0.6배
+      highDiff: +0.2, // High = 1.1배
     },
   };
 
-  // 성장 점수, 규모, 비상장 여부 등을 간단하게 반영
+  // ---- 2. 플래그/스코어를 멀티플에 반영하는 함수 ----
   function adjustMultiples(mode, rawMultiples, opts) {
-    const { sizeBucket, growthScore, isPrivate, isHighRisk } = opts;
+    const { sizeBucket, growthScore, isPrivate, isHighRisk, extraShift = 0 } = opts;
 
     let { low, base, high } = rawMultiples;
 
-    // 규모: 소형이면 약간 하향, 대형이면 약간 상향
+    // 규모: 소형이면 살짝 디스카운트, 대형이면 살짝 프리미엄
     const sizeAdj = sizeBucket === "small" ? -0.3 : sizeBucket === "large" ? +0.3 : 0;
 
-    // 성장 점수: -2~+2 → -0.5~+0.5 정도로 반영
+    // 성장 스코어: -2~+2 → -0.5~+0.5 정도
     const growthAdj = (growthScore || 0) * 0.25;
 
-    // 금융 리스크: PBR 밴드 보수적 조정
+    // 금융 포트폴리오 리스크 플래그
     const riskAdj = isHighRisk && mode === "fs" ? -0.1 : 0;
 
-    low += sizeAdj + growthAdj + riskAdj;
-    base += sizeAdj + growthAdj + riskAdj;
-    high += sizeAdj + growthAdj + riskAdj;
-
-    // 비상장사는 멀티플 자체를 조정하기보단 결과에서 할인 적용 예정
-    // 필요하면 여기서도 소폭 조정 가능
+    low += sizeAdj + growthAdj + riskAdj + extraShift;
+    base += sizeAdj + growthAdj + riskAdj + extraShift;
+    high += sizeAdj + growthAdj + riskAdj + extraShift;
 
     return { low, base, high };
   }
 
-  // ---- 3. 계산 처리 ----
+  // 비금융 플래그 → 멀티플 시프트
+  function computeNonfsFlagShift() {
+    let shift = 0;
+
+    const highGrowth = document.getElementById("chkGrowth");
+    const turnaround = document.getElementById("chkTurnaround");
+    const govRisk = document.getElementById("chkGovRisk");
+    const cycleRadio = document.querySelector('input[name="cycleNonfs"]:checked');
+    const stageRadio = document.querySelector('input[name="stageNonfs"]:checked');
+
+    if (highGrowth && highGrowth.checked) shift += 0.4; // 고성장 → 상향
+    if (turnaround && turnaround.checked) shift -= 0.3; // 턴어라운드 → 보수적
+    if (govRisk && govRisk.checked) shift -= 0.3; // 회계/내부통제 취약 → 디스카운트
+
+    const cycle = cycleRadio ? cycleRadio.value : "normal";
+    if (cycle === "low") shift -= 0.2;
+    if (cycle === "high") shift += 0.2;
+
+    const stage = stageRadio ? stageRadio.value : "Mature";
+    if (stage === "Early") shift -= 0.2;
+    if (stage === "Mature") shift += 0.1; // 성숙기업이면 약간 프리미엄
+
+    return shift;
+  }
+
+  // 금융 플래그 → 멀티플 시프트
+  function computeFsFlagShift() {
+    let shift = 0;
+
+    const govRiskFs = document.getElementById("fsChkGovRisk");
+    const cycleRadio = document.querySelector('input[name="cycleFs"]:checked');
+
+    if (govRiskFs && govRiskFs.checked) shift -= 0.1;
+
+    const cycle = cycleRadio ? cycleRadio.value : "normal";
+    if (cycle === "low") shift -= 0.1;
+    if (cycle === "high") shift += 0.1;
+
+    return shift;
+  }
+
+  // ---- 3. 메인 계산 로직 ----
   valuationForm.addEventListener("submit", (e) => {
     e.preventDefault();
     errorBox.classList.add("ml-hidden");
@@ -102,20 +149,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const growthScore = parseInt(document.getElementById("growthScore").value, 10) || 0;
     const sizeBucket = document.getElementById("sizeBucket").value;
     const isPrivate = document.getElementById("isPrivate").checked;
-    const isHighRisk = highRiskFlag.checked;
-
+    const isHighRisk = highRiskFlag && highRiskFlag.checked;
     const currency = document.getElementById("currency").value;
 
-    // 기본 값 검증 + 입력값 파싱
     let inputOk = true;
-    let errorMessages = [];
+    const errorMessages = [];
 
+    // 비금융 입력값
     let sales = null;
     let ebitda = null;
     let netIncome = null;
     let debt = null;
     let cash = null;
 
+    // 금융 입력값
     let equityBook = null;
     let netIncomeFs = null;
 
@@ -145,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 멀티플 설정
+    // ---- 멀티플 설정 ----
     let rawMultiples;
     if (mode === "nonfs") {
       const base = multipleRules.nonfs.baseEbitda;
@@ -163,27 +210,35 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
+    // 플래그에 따른 추가 시프트
+    const extraShift =
+      mode === "nonfs" ? computeNonfsFlagShift() : computeFsFlagShift();
+
     const adjustedMultiples = adjustMultiples(mode, rawMultiples, {
       sizeBucket,
       growthScore,
       isPrivate,
       isHighRisk,
+      extraShift,
     });
 
-    // 비상장 할인 (%)
-    const privateDiscountRate = isPrivate ? 0.25 : 0.0; // 기본 25% 디스카운트
+    // 비상장 할인 (결과 레벨에서 일괄 적용)
+    const privateDiscountRate = isPrivate ? 0.25 : 0.0;
 
     let resultRows = [];
     let chartValues = [];
 
     if (mode === "nonfs") {
+      // EV = EBITDA * 멀티플 / Equity = EV - 순차입금
       const evLow = ebitda * adjustedMultiples.low;
       const evBase = ebitda * adjustedMultiples.base;
       const evHigh = ebitda * adjustedMultiples.high;
 
-      const eqLow = evLow - (debt || 0) + (cash || 0);
-      const eqBase = evBase - (debt || 0) + (cash || 0);
-      const eqHigh = evHigh - (debt || 0) + (cash || 0);
+      const netDebt = (debt || 0) - (cash || 0);
+
+      const eqLow = evLow - netDebt;
+      const eqBase = evBase - netDebt;
+      const eqHigh = evHigh - netDebt;
 
       const eqLowAdj = eqLow * (1 - privateDiscountRate);
       const eqBaseAdj = eqBase * (1 - privateDiscountRate);
@@ -194,9 +249,9 @@ document.addEventListener("DOMContentLoaded", () => {
       baseEquityEl.textContent = formatValue(eqBaseAdj, currency);
       highEquityEl.textContent = formatValue(eqHighAdj, currency);
 
-      lowDescEl.textContent = `EV/EBITDA ${adjustedMultiples.low.toFixed(1)}배, 비상장 할인 ${
-        privateDiscountRate * 100
-      }% 적용`;
+      lowDescEl.textContent = `EV/EBITDA ${adjustedMultiples.low.toFixed(
+        1
+      )}배, 비상장 할인 ${privateDiscountRate * 100}% 적용`;
       baseDescEl.textContent = `EV/EBITDA ${adjustedMultiples.base.toFixed(
         1
       )}배, 비상장 할인 ${privateDiscountRate * 100}% 적용`;
@@ -233,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       chartValues = [eqLowAdj, eqBaseAdj, eqHighAdj];
     } else {
-      // 금융: 기본은 PBR 기준
+      // 금융: PBR 기반 → Equity Value = Book * PBR
       const pbrLow = adjustedMultiples.low;
       const pbrBase = adjustedMultiples.base;
       const pbrHigh = adjustedMultiples.high;
@@ -250,23 +305,23 @@ document.addEventListener("DOMContentLoaded", () => {
       baseEquityEl.textContent = formatValue(eqBaseAdj, currency);
       highEquityEl.textContent = formatValue(eqHighAdj, currency);
 
-      let riskNote = isHighRisk ? " (리스크 반영 밴드)" : "";
-      lowDescEl.textContent = `PBR ${pbrLow.toFixed(2)}배, 비상장 할인 ${
-        privateDiscountRate * 100
-      }%${riskNote}`;
-      baseDescEl.textContent = `PBR ${pbrBase.toFixed(2)}배, 비상장 할인 ${
-        privateDiscountRate * 100
-      }%${riskNote}`;
-      highDescEl.textContent = `PBR ${pbrHigh.toFixed(2)}배, 비상장 할인 ${
-        privateDiscountRate * 100
-      }%${riskNote}`;
+      const riskNote = isHighRisk ? " (리스크 플래그 반영)" : "";
+      lowDescEl.textContent = `PBR ${pbrLow.toFixed(
+        2
+      )}배, 비상장 할인 ${privateDiscountRate * 100}%${riskNote}`;
+      baseDescEl.textContent = `PBR ${pbrBase.toFixed(
+        2
+      )}배, 비상장 할인 ${privateDiscountRate * 100}%${riskNote}`;
+      highDescEl.textContent = `PBR ${pbrHigh.toFixed(
+        2
+      )}배, 비상장 할인 ${privateDiscountRate * 100}%${riskNote}`;
 
       resultRows = [
         {
           caseName: "Low Case",
           multipleText: `PBR ${pbrLow.toFixed(2)}배`,
           baseMetric: `자기자본 ${formatValue(equityBook, currency)}`,
-          ev: eqLow, // 금융은 EV ~ Equity로 간주
+          ev: eqLow,
           eq: eqLowAdj,
           note: "리스크 반영 하단 밴드",
         },
@@ -276,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
           baseMetric: `자기자본 ${formatValue(equityBook, currency)}`,
           ev: eqBase,
           eq: eqBaseAdj,
-          note: "산업 평균 또는 목표 밴드",
+          note: "업권 평균 밴드",
         },
         {
           caseName: "High Case",
@@ -291,18 +346,16 @@ document.addEventListener("DOMContentLoaded", () => {
       chartValues = [eqLowAdj, eqBaseAdj, eqHighAdj];
     }
 
-    // 테이블 렌더링
+    // 테이블 & 차트 렌더링
     renderResultTable(resultRows, currency);
-
-    // 차트 렌더링
     renderChart(chartValues, currency);
 
-    // 결과 섹션 표시
+    // 결과 섹션 보여주기
     resultsSection.classList.remove("ml-hidden");
     resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // ---- 유틸 함수들 ----
+  // ---- 유틸리티 함수들 ----
   function toNumber(id, allowEmpty = false) {
     const el = document.getElementById(id);
     if (!el) return null;
