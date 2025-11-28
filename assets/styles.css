@@ -1,469 +1,359 @@
-/* 기본 리셋에 가까운 최소 스타일 */
-*,
-*::before,
-*::after {
+/* 기본 리셋 */
+* {
   box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-html,
 body {
   margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  padding: 16px;
+  background: #f3f4f6;
   color: #111827;
-  background-color: #f9fafb;
+  font-size: 14px;
 }
 
-body {
-  line-height: 1.5;
-}
-
-/* 공통 컨테이너 */
-.ml-container {
-  max-width: 1080px;
+/* 전체 감싸는 박스 */
+.wrapper {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 20px 40px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
 }
 
 /* 헤더 */
-.ml-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background-color: rgba(255, 255, 255, 0.96);
+header {
+  margin-bottom: 16px;
   border-bottom: 1px solid #e5e7eb;
-  backdrop-filter: blur(10px);
+  padding-bottom: 10px;
 }
 
-.ml-header-inner {
+header h1 {
+  font-size: 18px;
+  margin: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 56px;
+  gap: 8px;
 }
 
-.ml-logo {
-  display: flex;
-  flex-direction: column;
-}
-
-.ml-logo-main {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.ml-logo-sub {
+header h1 span.badge {
   font-size: 11px;
-  color: #6b7280;
-}
-
-.ml-nav a {
-  margin-left: 16px;
-  font-size: 14px;
-  text-decoration: none;
-  color: #4b5563;
-}
-
-.ml-nav a:hover {
-  color: #111827;
-}
-
-/* Hero */
-.ml-hero {
-  padding: 48px 0 32px;
-  background: radial-gradient(circle at top left, #e5f0ff 0, #f9fafb 50%);
-}
-
-.ml-hero-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
-  align-items: center;
-}
-
-.ml-hero-text {
-  flex: 1 1 260px;
-}
-
-.ml-hero-text h1 {
-  margin: 0 0 12px;
-  font-size: 28px;
-  line-height: 1.25;
-}
-
-.ml-hero-text p {
-  margin: 0 0 20px;
-  color: #4b5563;
-  font-size: 14px;
-}
-
-.ml-hero-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.ml-hero-preview {
-  flex: 0 1 260px;
-  display: flex;
-  justify-content: center;
-}
-
-.ml-card-preview {
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
-  min-width: 220px;
-}
-
-.ml-card-preview-title {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 4px;
-}
-
-.ml-card-preview-value {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.ml-card-preview-sub {
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-/* 공통 버튼 */
-.ml-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
+  background: #0f766e;
+  color: #ecfeff;
   border-radius: 999px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease,
-    box-shadow 0.15s ease;
+  padding: 2px 8px;
 }
 
-.ml-btn-primary {
-  background-color: #2563eb;
-  color: #ffffff;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-}
-
-.ml-btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.ml-btn-secondary {
-  background-color: #ffffff;
-  color: #111827;
-  border-color: #d1d5db;
-}
-
-.ml-btn-secondary:hover {
-  border-color: #9ca3af;
-}
-
-/* 섹션 */
-.ml-section {
-  padding: 32px 0 40px;
-}
-
-.ml-section-alt {
-  background-color: #ffffff;
-}
-
-.ml-section h2 {
-  margin: 0 0 8px;
-  font-size: 22px;
-}
-
-.ml-section-subtitle {
-  margin: 0 0 24px;
-  font-size: 14px;
+header .subtitle {
+  font-size: 12px;
   color: #6b7280;
+  margin-top: 4px;
 }
 
-/* 폼 */
-.ml-form {
-  margin-top: 16px;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-}
-
-.ml-form-section + .ml-form-section {
-  margin-top: 20px;
-  border-top: 1px solid #f3f4f6;
-  padding-top: 16px;
-}
-
-.ml-form-section h3 {
-  margin: 0 0 10px;
-  font-size: 16px;
-}
-
-.ml-grid-3 {
+/* 좌측 입력 / 우측 결과 레이아웃 */
+.layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px 16px;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  margin-top: 10px;
 }
 
-.ml-form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* 카드 기본 스타일 */
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 14px 14px 16px;
 }
 
-.ml-form-field label {
+.card-title {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+/* 폼 입력 요소들 */
+.form-group {
+  margin-bottom: 8px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 2px;
   color: #374151;
 }
 
-.ml-label-sub {
-  font-weight: 400;
-  color: #9ca3af;
-  margin-left: 4px;
-}
-
-.ml-form-field input,
-.ml-form-field select {
-  padding: 7px 10px;
-  font-size: 13px;
-  border-radius: 8px;
+select,
+input[type="number"],
+input[type="text"] {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
   border: 1px solid #d1d5db;
+  font-size: 13px;
   outline: none;
 }
 
-.ml-form-field input:focus,
-.ml-form-field select:focus {
+select:focus,
+input[type="number"]:focus,
+input[type="text"]:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
 }
 
-/* 라디오/체크박스 */
-.ml-radio-group label,
-.ml-checkbox-group label {
-  display: inline-flex;
+.inline-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
   align-items: center;
-  font-size: 13px;
-  color: #4b5563;
-  margin-right: 12px;
 }
 
-.ml-radio-group input,
-.ml-checkbox-group input {
-  margin-right: 6px;
+.inline-input span.unit {
+  font-size: 12px;
+  color: #6b7280;
 }
 
-/* Range */
-.ml-range-labels {
+.checkbox-row,
+.radio-row {
   display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #9ca3af;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 12px;
   margin-top: 2px;
 }
 
-/* 도움 텍스트 */
-.ml-help-text {
-  margin: 4px 0 0;
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-/* 폼 액션 */
-.ml-form-actions {
-  margin-top: 18px;
+.checkbox-row label,
+.radio-row label {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
 }
 
-.ml-error-box {
+input[type="checkbox"],
+input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+/* 버튼영역 (PC=왼쪽 / 모바일=중앙) */
+.btn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  justify-content: flex-start;  /* 기본: 왼쪽 정렬 */
+}
+
+/* 모바일에서만 중앙 */
+@media (max-width: 600px) {
+  .btn-row {
+    justify-content: center;
+  }
+}
+
+/* 버튼 공통 */
+button {
+  border-radius: 999px;
+  padding: 6px 10px;
   font-size: 12px;
-  color: #b91c1c;
-  background-color: #fef2f2;
-  border-radius: 8px;
-  padding: 8px 10px;
-  border: 1px solid #fecaca;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
 }
 
-/* 결과 카드 */
-.ml-results {
-  margin-top: 24px;
+.btn-primary {
+  background: #2563eb;
+  color: #eff6ff;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
 }
 
-.ml-result-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+.btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+.btn-secondary:hover {
+  background: #d1d5db;
 }
 
-.ml-result-card {
-  padding: 14px 14px 12px;
-  border-radius: 14px;
-  background-color: #ffffff;
+/* 결과 영역 */
+.result {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.result h2 {
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+
+.result h3 {
+  font-size: 13px;
+  margin: 14px 0 4px;
+}
+
+.result table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 4px 0 8px;
+}
+
+.result table th,
+.result table td {
   border: 1px solid #e5e7eb;
+  padding: 4px 6px;
+  text-align: left;
 }
 
-.ml-result-card-main {
-  border-color: #2563eb;
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.18);
+.result table th {
+  background: #f9fafb;
+  font-weight: 600;
 }
 
-.ml-result-label {
-  font-size: 12px;
+.result ul {
+  margin: 4px 0 8px 16px;
+  padding: 0;
+}
+
+.result ul li {
+  margin-bottom: 2px;
+}
+
+.highlight-line {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.muted {
   color: #6b7280;
-  margin-bottom: 4px;
 }
 
-.ml-result-value {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
+/* PDF 저장 버튼 */
+.pdf-btn-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.ml-result-sub {
-  font-size: 12px;
-  color: #9ca3af;
+/* 인쇄용 요약 */
+.print-summary {
+  display: none;
+  margin-top: 18px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 12px;
 }
 
-/* 테이블 */
-.ml-result-table-wrapper {
-  margin-top: 12px;
-  overflow-x: auto;
+.print-summary h3 {
+  font-size: 14px;
+  margin: 0 0 6px;
 }
 
-.ml-table {
+.print-summary table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
 }
 
-.ml-table th,
-.ml-table td {
-  padding: 8px 6px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
+.print-summary table td {
+  border: 1px solid #e5e7eb;
+  padding: 4px 6px;
 }
 
-.ml-table thead th {
-  font-size: 12px;
+.print-summary table td:first-child {
+  width: 110px;
   font-weight: 600;
-  color: #6b7280;
-  background-color: #f9fafb;
+  background: #f9fafb;
 }
 
-/* 차트 */
-.ml-chart-wrapper {
-  margin-top: 16px;
+/* 업종 선택 드롭다운 */
+.mode-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-/* 디스클레이머 */
-.ml-disclaimer {
-  margin-top: 14px;
+/* 산업 선택 드롭다운: 라벨 1줄 유지 */
+.mode-row select {
+  width: 190px;
+}
+
+.hint {
   font-size: 11px;
   color: #9ca3af;
-}
-
-/* About 리스트 */
-.ml-about-list {
-  margin: 16px 0;
-  padding-left: 18px;
-  font-size: 14px;
-  color: #4b5563;
-}
-
-/* CTA */
-.ml-contact-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-top: 2px;
 }
 
 /* Footer */
-.ml-footer {
-  border-top: 1px solid #e5e7eb;
-  padding: 12px 0;
-  background-color: #f9fafb;
+.footer {
+  margin-top: 12px;
   font-size: 11px;
-  color: #6b7280;
-}
-
-.ml-footer .ml-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.ml-footer-note {
   color: #9ca3af;
+  text-align: right;
 }
 
-/* 유틸리티 */
-.ml-hidden {
-  display: none !important;
-}
-
-/* 반응형 */
-@media (max-width: 640px) {
-  .ml-header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    height: auto;
-    padding: 8px 0;
-    gap: 4px;
+/* 모바일 전체 레이아웃 */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
   }
 
-  .ml-hero {
-    padding-top: 32px;
-  }
-
-  .ml-hero-text h1 {
-    font-size: 22px;
-  }
-
-  .ml-hero-inner {
-    flex-direction: column;
-  }
-
-  .ml-form {
-    padding: 14px;
+  .mode-row select {
+    width: 100%;
   }
 }
 
-/* 모바일에서 Hero 카드 축소/숨기기 */
-@media (max-width: 640px) {
-  .ml-hero {
-    padding: 24px 0 16px;  /* 위아래 여백 줄이기 */
+/* 인쇄 모드 */
+@media print {
+  body {
+    background: #ffffff;
   }
 
-  .ml-hero-inner {
-    flex-direction: column;
-    gap: 16px;
+  @page {
+    margin: 12mm;
   }
 
-  .ml-hero-text h1 {
-    font-size: 20px;
+  .layout > section:first-child,
+  button,
+  .btn-row,
+  .pdf-btn-row,
+  .footer {
+    display: none !important;
   }
 
-  .ml-hero-text p {
-    font-size: 13px;
+  .print-summary {
+    display: block;
   }
 
-  /* 예시 카드 너무 크면 아예 숨김 */
-  .ml-hero-preview {
-    display: none;
+  .wrapper {
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .layout {
+    display: block !important;
+  }
+
+  .card {
+    width: 100% !important;
+    border: none;
+    padding: 0;
+  }
+
+  header {
+    border-bottom: none;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
   }
 }
